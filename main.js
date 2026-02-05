@@ -207,6 +207,27 @@ function cleanCanvas() {
 
 function initEvents () {
   document.addEventListener('keydown', keyDownHandler);
+
+  document.addEventListener('mousedown', e => {
+    if (e.target.closest('#left-btn')) {
+      leftPressed = true;
+    }
+    
+    if (e.target.closest('#right-btn')) {
+      rightPressed = true;
+    }
+  });
+
+  document.addEventListener('mouseup', e => {
+    if (e.target.closest('#left-btn')) {
+      leftPressed = false;
+    }
+    
+    if (e.target.closest('#right-btn')) {
+      rightPressed = false;
+    }
+  });
+
   document.addEventListener('keyup', keyUpHandler);
   
   function keyDownHandler (event) {

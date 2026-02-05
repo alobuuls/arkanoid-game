@@ -207,29 +207,73 @@ function cleanCanvas() {
 
 function initEvents () {
   document.addEventListener('keydown', keyDownHandler);
+  document.addEventListener('keyup', keyUpHandler);
 
-  document.addEventListener('mousedown', e => {
-    if (e.target.closest('#left-btn')) {
-      leftPressed = true;
-    }
-    
-    if (e.target.closest('#right-btn')) {
-      rightPressed = true;
-    }
+  // ===== BOTONES MOBILE + DESKTOP =====
+  const leftBtn = document.getElementById('left-btn');
+  const rightBtn = document.getElementById('right-btn');
+
+  function pressLeft() { leftPressed = true; }
+  function releaseLeft() { leftPressed = false; }
+
+  function pressRight() { rightPressed = true; }
+  function releaseRight() { rightPressed = false; }
+
+  // mouse
+  leftBtn.addEventListener('mousedown', pressLeft);
+  leftBtn.addEventListener('mouseup', releaseLeft);
+  leftBtn.addEventListener('mouseleave', releaseLeft);
+
+  rightBtn.addEventListener('mousedown', pressRight);
+  rightBtn.addEventListener('mouseup', releaseRight);
+  rightBtn.addEventListener('mouseleave', releaseRight);
+
+  // touch
+  leftBtn.addEventListener('touchstart', e => {
+    e.preventDefault();
+    pressLeft();
   });
 
-  document.addEventListener('mouseup', e => {
-    if (e.target.closest('#left-btn')) {
-      leftPressed = false;
-    }
-    
-    if (e.target.closest('#right-btn')) {
+  leftBtn.addEventListener('touchend', releaseLeft);
+
+  rightBtn.addEventListener('touchstart', e => {
+    e.preventDefault();
+    pressRight();
+  });
+
+  rightBtn.addEventListener('touchend', releaseRight);
+
+  // ===== TAP EN PANTALLA (MOBILE) =====
+  canvas.addEventListener('touchstart', e => {
+    e.preventDefault();
+    const touchX = e.touches[0].clientX;
+    const screenMiddle = window.innerWidth / 2;
+
+    if (touchX < screenMiddle) {
+      leftPressed = true;
       rightPressed = false;
     }
+
+    if (touchX >= screenMiddle) {
+      rightPressed = true;
+      leftPressed = false
+    }
   });
 
-  document.addEventListener('keyup', keyUpHandler);
-  
+  canvas.addEventListener('touchmove', e => {
+    const touchX = e.touches[0].clientX;
+    const middle = window.innerWidth / 2;
+
+    leftPressed = touchX < middle;
+    rightPressed = touchX >= middle;
+  });
+
+  canvas.addEventListener('touchend', () => {
+    leftPressed = false;
+    rightPressed = false;
+  });
+
+  // ===== TECLADO =====
   function keyDownHandler (event) {
     const { key } = event;
     if (key === 'Right' || key === 'ArrowRight' || key.toLowerCase() === 'd') {
@@ -238,7 +282,7 @@ function initEvents () {
       leftPressed = true;
     }
   }
-  
+
   function keyUpHandler (event) {
     const { key } = event;
     if (key === 'Right' || key === 'ArrowRight' || key.toLowerCase() === 'd') {
